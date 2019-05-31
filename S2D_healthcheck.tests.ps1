@@ -40,8 +40,8 @@ foreach ($cluster in $clusters) {
                 (Invoke-Command -computername $cluster -scriptblock {Get-Cluster}).CsvBalancer |  Should Be 0
             }
             #Check that CSV cache is configured
-            It "CSV cache should be configured to 0" {
-                (Invoke-Command -computername $cluster -scriptblock {Get-Cluster}).BlockCacheSize |  Should Be 0
+            It "CSV cache should be configured to 10GB" {
+                (Invoke-Command -computername $cluster -scriptblock {Get-Cluster}).BlockCacheSize |  Should Be 10240
             }
             #Check if core cluster resources online
             $coreClusterResources = Invoke-Command -computername $cluster -ScriptBlock {
