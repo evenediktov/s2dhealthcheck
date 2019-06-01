@@ -165,8 +165,10 @@ foreach ($clunode in $clunodes) {
             }
         }
         #Check that necessary folders are excluded
+        $csvvols = Invoke-Command -computername $clunode -scriptblock {((Get-WmiObject win32_volume -Filter "FileSystem='CSVFS'").DeviceID).TrimEnd("\")}
         $ExcludedFolder = $realtimeexclusions.ExcludedFolder.Split("|")
         $hvsdirexcl = @("%ProgramData%\Microsoft\Windows\Hyper-V","%ProgramFiles%\Hyper-V","%Public%\Documents\Hyper-V\Virtual Hard Disks","%SystemDrive%\ProgramData\Microsoft\Windows\Hyper-V\Snapshots","C:\ClusterStorage","\Device\HarddiskVolume*","%Systemroot%\Cluster")
+        $hvsdirexcl += $csvvols
         foreach ($hvsdirexclitem in $hvsdirexcl) {
             $hvsdirexttest = if ($hvsdirexclitem -in ($ExcludedFolder)){$hvsdirexclitem} else {$null}
             It "[$hvsdirexclitem] folder should be excluded from AV scan" {
@@ -175,7 +177,7 @@ foreach ($clunode in $clunodes) {
         }
         #Check that necessary processes are excluded
         $ExcludedFile = $realtimeexclusions.ExcludedFile.Split("|")
-        $hvsproxexcl =@("Vmms.exe","Vmwp.exe","Vmsp.exe","Vmcompute.exe","VmmAgent.exe","clussvc.exe","rhs.exe")
+        $hvsproxexcl =@("Vmms.exe","Vmwp.exe","Vmsp.exe","Vmcompute.exe","VmmAgent.exe","clussvc.exe","rhs.exe","ams.exe")
         foreach ($hvsproxexclitem in $hvsproxexcl) {
             $hvsprocetest = if ($hvsproxexclitem -in ($ExcludedFile)) {$hvsproxexclitem} else {$null}
             It "[$hvsproxexclitem] process should be excluded from AV scan" {
